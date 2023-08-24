@@ -104,9 +104,9 @@ class RecipeViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @decorators.action(
-            detail=True,
-            methods=['POST', 'DELETE'],
-            permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=['POST', 'DELETE'],
+        permission_classes=[IsAuthenticated]
     )
     def favorite(self, request, pk):
         if request.method == 'POST':
