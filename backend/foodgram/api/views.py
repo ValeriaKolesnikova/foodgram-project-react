@@ -30,9 +30,9 @@ class CustomUserViewSet(UserViewSet):
     permission_classes = [AllowAny]
 
     @decorators.action(
-            detail=True,
-            methods=['POST', 'DELETE'],
-            permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=['POST', 'DELETE'],
+        permission_classes=[IsAuthenticated]
     )
     def subscribe(self, request, **kwargs):
         user = request.user
