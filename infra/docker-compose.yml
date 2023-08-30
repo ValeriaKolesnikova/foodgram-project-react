@@ -64,7 +64,54 @@
 #   static_value:
 #   media_value:
 
-version: '3.3'
+# version: '3.3'
+
+# volumes:
+#   pg_data:
+#   static:
+#   media:
+
+# services:
+
+#   db:
+#     image: postgres:13.4
+#     ports:
+#       - 5432:5432
+#     restart: always
+#     env_file:
+#       - ../.env
+#     volumes:
+#       - pg_data:/var/lib/postgresql/data/
+
+#   backend:
+#     image: pendu1um/final_backend
+#     volumes:
+#       - static:/app/static/
+#       - media:/app/media/
+#     env_file:
+#       - ../.env
+#     depends_on:
+#       - db
+
+#   frontend:
+#     image: pendu1um/final_frontend
+#     volumes:
+#       - ../frontend/:/app/result_build/
+
+
+#   nginx:
+#     image: pendu1um/final_nginx
+#     ports:
+#       - "8090:80"
+#     volumes:
+#       # - ./nginx.conf:/etc/nginx/conf.d/default.conf
+#       # - ../frontend/build:/usr/share/nginx/html/
+#       # - ../docs/:/usr/share/nginx/html/api/docs/
+#       - static:/var/html/static/
+#       - media:/var/html/media/
+
+
+version: '3'
 
 volumes:
   pg_data:
@@ -72,40 +119,40 @@ volumes:
   media:
 
 services:
-
   db:
-    image: postgres:13.4
-    ports:
-      - 5432:5432
-    restart: always
-    env_file:
-      - ../.env
+    image: postgres:13
+    env_file: ../.env
     volumes:
-      - pg_data:/var/lib/postgresql/data/
-
+      - pg_data:/var/lib/postgresql/data
+  
   backend:
-    image: pendu1um/final_backend
-    volumes:
-      - static:/app/static/
-      - media:/app/media/
-    env_file:
-      - ../.env
+    build: ../backend/
+    env_file: ../.env
     depends_on:
       - db
-
+    volumes:
+      - static:/backend_static
+      - media:/app/media
+  
   frontend:
-    image: pendu1um/final_frontend
+    env_file: ../.env
+    build: ../frontend/
+    depends_on:
+      - backend
+    command: cp -r /app/build/. /static/
     volumes:
-      - ../frontend/:/app/result_build/
-
-
-  nginx:
-    image: pendu1um/final_nginx
+      - static:/static
+  
+  gateway:
+    build: ../infra/
+    env_file: ../.env
+    depends_on:
+      - frontend   
     ports:
-      - "80:8090"
+      - 8090:80
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ../frontend/build:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/api/docs/
-      - static:/var/html/static/
-      - media:/var/html/media/
+      - static:/static
+      - media:/app/media
+
+
+
