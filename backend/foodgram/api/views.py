@@ -48,7 +48,7 @@ class CustomUserViewSet(UserViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
-        if request.method == 'DELETE':
+        elif request.method == 'DELETE':
             get_object_or_404(Follow, user=user, author=author).delete()
             return Response({'detail': 'Вы успешно отписались'},
                             status=status.HTTP_204_NO_CONTENT)
