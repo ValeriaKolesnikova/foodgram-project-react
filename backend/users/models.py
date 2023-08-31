@@ -4,7 +4,7 @@ from django.db.models import UniqueConstraint
 
 
 class User(AbstractUser):
-
+    """Модель Пользователя."""
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name',)
 
@@ -61,6 +61,7 @@ class User(AbstractUser):
 
 
 class Follow(models.Model):
+    """Модель подписок Пользователя."""
     user = models.ForeignKey(
         User,
         related_name='follower',

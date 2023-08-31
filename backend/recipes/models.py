@@ -7,6 +7,7 @@ FIELD_MAX_LENGTH = 200
 COLOR_MAX_LENGHT = 7 
 
 class Tag(models.Model):
+    """Модель тегов."""
     name = models.CharField(
         max_length=FIELD_MAX_LENGTH,
         verbose_name='Название тега',
@@ -32,6 +33,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
+    """Модель рецептов."""
     name = models.CharField(max_length=200)
     cooking_time = models.PositiveSmallIntegerField('Время приготовления')
     text = models.TextField('Описание')
@@ -58,6 +60,7 @@ class Recipe(models.Model):
 
 
 class Ingredient(models.Model):
+    """Модель списка ингредиентов."""
     name = models.CharField(
         max_length=FIELD_MAX_LENGTH,
         verbose_name=('Название ингредиента'),
@@ -77,12 +80,16 @@ class Ingredient(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """Количество ингредиентов в рецепте.
+    Модель связывает Recipe и Ingredient с указанием количества ингредиентов.
+    """
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     amount = models.PositiveIntegerField()
 
 
 class FavouriteRecipe(models.Model):
+    """Модель избранного."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -109,6 +116,7 @@ class FavouriteRecipe(models.Model):
 
 
 class ShoppingCart(models.Model):
+    """Рецепты в корзине покупок."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

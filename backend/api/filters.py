@@ -5,6 +5,7 @@ from users.models import User
 
 
 class IngredientFilter(FilterSet):
+    """Фильтр для ингридиентов."""
     name = filters.CharFilter(lookup_expr='startswith')
 
     class Meta:
@@ -13,6 +14,7 @@ class IngredientFilter(FilterSet):
 
 
 class RecipeFilter(FilterSet):
+    """Фильтр для рецептов."""
     author = filters.ModelChoiceFilter(queryset=User.objects.all())
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',

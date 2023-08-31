@@ -24,6 +24,7 @@ from .filters import IngredientFilter, RecipeFilter
 
 
 class CustomUserViewSet(UserViewSet):
+    """Вьюсет для кастомной модели пользователя."""
     queryset = User.objects.all()
     serializer_class = UsersSerializer
     pagination_class = LimitPageNumberPagination
@@ -71,6 +72,7 @@ class CustomUserViewSet(UserViewSet):
 
 
 class TagViewSet(ModelViewSet):
+    """Вьюсет для отображения тегов."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [AllowAny]
@@ -78,6 +80,7 @@ class TagViewSet(ModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
+    """Вьюсет для отображения рецептов."""
     queryset = Recipe.objects.all()
     permission_classes = (AuthorOrReadOnly,)
     pagination_class = LimitPageNumberPagination
@@ -151,6 +154,7 @@ class RecipeViewSet(ModelViewSet):
 
 
 class IngredientViewSet(ModelViewSet):
+    """Вьюсет для отображения ингредиентов."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny]
