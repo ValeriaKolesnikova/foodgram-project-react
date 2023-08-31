@@ -4,7 +4,8 @@ from django.db.models import UniqueConstraint
 from users.models import User
 
 FIELD_MAX_LENGTH = 200
-COLOR_MAX_LENGHT = 7 
+COLOR_MAX_LENGHT = 7
+
 
 class Tag(models.Model):
     """Модель тегов."""

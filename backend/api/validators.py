@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 MIN_INGREDIENT_AMOUNT = 1
 
+
 def validate_ingredients(ingredients):
     if not ingredients:
         raise serializers.ValidationError(

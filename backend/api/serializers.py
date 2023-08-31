@@ -11,7 +11,6 @@ from recipes.models import (
     Ingredient, FavouriteRecipe, ShoppingCart
 )
 from users.models import User, Follow
-from .validators import validate_ingredients
 
 
 MIN_INGREDIENT_AMOUNT = 1
@@ -71,10 +70,13 @@ class UsersSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'username',
                   'first_name', 'last_name', 'is_subscribed',)
 
-    def get_is_subscribed(self, obj): 
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request and not request.user.is_anonymous:
-            is_subscribed = Follow.objects.filter(user=request.user, author=obj).exists()
+            is_subscribed = Follow.objects.filter(
+                user=request.user,
+                author=obj
+            ).exists()
             return is_subscribed
         return False
 
@@ -226,22 +228,22 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        ingredient = validated_data.pop('ingredients') 
-        tags = validated_data.pop('tags') 
-        recipe = None 
+        ingredient = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        recipe = None
         existing_recipe = Recipe.objects.filter(
-            Q(name=validated_data['name']) & 
-            Q(text=validated_data['text']) &
-            Q(cooking_time=validated_data['cooking_time'])
+            Q(name=validated_data['name'])
+            & Q(text=validated_data['text'])
+            & Q(cooking_time=validated_data['cooking_time'])
         ).first()
 
         if existing_recipe:
             recipe = existing_recipe
             recipe.tags.set(tags)
         else:
-            recipe = Recipe.objects.create(**validated_data) 
-            recipe.tags.set(tags) 
-            self.create_ingredients(ingredient, recipe) 
+            recipe = Recipe.objects.create(**validated_data)
+            recipe.tags.set(tags)
+            self.create_ingredients(ingredient, recipe)
 
         return recipe
 
@@ -252,10 +254,10 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
             ing = RecipeIngredient.objects.filter(recipe=instance)
             ing.delete()
             self.create_ingredients(ingredients, instance)
-        
+
         if 'tags' in validated_data:
             instance.tags.set(validated_data.pop('tags'))
-        
+
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
