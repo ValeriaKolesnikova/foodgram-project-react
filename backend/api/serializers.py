@@ -1,4 +1,4 @@
-from django.db.models import F, Q
+from django.db.models import F
 from django.db.transaction import atomic
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.fields import SerializerMethodField
@@ -11,7 +11,7 @@ from recipes.models import (
     Ingredient, FavouriteRecipe, ShoppingCart
 )
 from users.models import User, Follow
-from .validators import validate_ingredients
+from recipes.validators import validate_ingredients, validate_cooking_time
 
 
 MIN_INGREDIENT_AMOUNT = 1
@@ -68,8 +68,10 @@ class UsersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username',
-                  'first_name', 'last_name', 'is_subscribed',)
+        fields = (
+            'id', 'email', 'username',
+            'first_name', 'last_name', 'is_subscribed',
+        )
 
     def get_is_subscribed(self, obj):
         """Проверка подписки пользователей."""
@@ -194,12 +196,17 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = fields = (
+            'id', 'tags', 'author', 'ingredients',
+            'name', 'image', 'text', 'cooking_time',
+        )
 
     def validate(self, data):
         """Проверяем ингредиенты в рецепте."""
         ingredients = data.get('ingredients')
+        cooking_time = data.get('cooking_time')
         validate_ingredients(ingredients)
+        validate_cooking_time(cooking_time)
         return data
 
     def create_ingredients(self, ingredients, recipe):
@@ -217,22 +224,21 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        ingredient = validated_data.pop('ingredients')
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        recipe = None
-        existing_recipe = Recipe.objects.filter(
-            Q(name=validated_data['name'])
-            & Q(text=validated_data['text'])
-            & Q(cooking_time=validated_data['cooking_time'])
-        ).first()
 
-        if existing_recipe:
-            recipe = existing_recipe
+        recipe, created = Recipe.objects.get_or_create(
+            name=validated_data['name'],
+            text=validated_data['text'],
+            cooking_time=validated_data['cooking_time'],
+            defaults=validated_data
+        )
+
+        if created:
             recipe.tags.set(tags)
+            self.create_ingredients(ingredients, recipe)
         else:
-            recipe = Recipe.objects.create(**validated_data)
-            recipe.tags.set(tags)
-            self.create_ingredients(ingredient, recipe)
+            raise serializers.ValidationError('Рецепт уже существует')
 
         return recipe
 

@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import UniqueConstraint
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import User
 
@@ -35,7 +36,7 @@ class Tag(models.Model):
 
 class Recipe(models.Model):
     """Модель рецептов."""
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=FIELD_MAX_LENGTH)
     cooking_time = models.PositiveSmallIntegerField('Время приготовления')
     text = models.TextField('Описание')
     author = models.ForeignKey(
@@ -86,7 +87,12 @@ class RecipeIngredient(models.Model):
     """
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1, message='Минимальное количество 1!'),
+            MaxValueValidator(100, message='Максимальное значение 100!')
+        ]
+    )
 
 
 class FavouriteRecipe(models.Model):

@@ -40,19 +40,17 @@ class CustomUserViewSet(UserViewSet):
         author_id = self.kwargs.get('id')
         author = get_object_or_404(User, id=author_id)
         if request.method == 'POST':
-            serializer = FollowSerializer(author,
-                                          data=request.data,
-                                          context={'request': request})
+            serializer = FollowSerializer(
+                author,
+                data=request.data,
+                context={'request': request}
+            )
             serializer.is_valid(raise_exception=True)
             Follow.objects.create(user=user, author=author)
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
-        elif request.method == 'DELETE':
-            get_object_or_404(Follow, user=user, author=author).delete()
-            return Response({'detail': 'Вы успешно отписались'},
-                            status=status.HTTP_204_NO_CONTENT)
 
     @decorators.action(
         detail=False,
