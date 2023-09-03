@@ -196,16 +196,20 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = fields = (
+        fields = (
             'id', 'tags', 'author', 'ingredients',
             'name', 'image', 'text', 'cooking_time',
         )
-
-    def validate(self, data):
+    
+    def vvalidate_ingredients(self, data):
         """Проверяем ингредиенты в рецепте."""
         ingredients = data.get('ingredients')
-        cooking_time = data.get('cooking_time')
         validate_ingredients(ingredients)
+        return data
+
+    def validate_cooking_time(self, data):
+        """Проверяем время приготовления."""
+        cooking_time = data.get('cooking_time')        
         validate_cooking_time(cooking_time)
         return data
 
