@@ -200,7 +200,7 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
             'id', 'tags', 'author', 'ingredients',
             'name', 'image', 'text', 'cooking_time',
         )
-    
+
     def vvalidate_ingredients(self, data):
         """Проверяем ингредиенты в рецепте."""
         ingredients = data.get('ingredients')
@@ -209,7 +209,7 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
 
     def validate_cooking_time(self, data):
         """Проверяем время приготовления."""
-        cooking_time = data.get('cooking_time')        
+        cooking_time = data.get('cooking_time')
         validate_cooking_time(cooking_time)
         return data
 
