@@ -51,6 +51,12 @@ class CustomUserViewSet(UserViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
+        else:
+            get_object_or_404(Follow, user=user, author=author).delete()
+            return Response(
+                {'detail': 'Вы успешно отписались'},
+                status=status.HTTP_204_NO_CONTENT
+            )
 
     @decorators.action(
         detail=False,

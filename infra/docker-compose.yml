@@ -1,16 +1,22 @@
 version: '3.3'
+
+volumes:
+  pg_data:
+  static_value:
+  media_value:
+
 services:
 
   db:
-    image: postgres:13-alpine
+    image: postgres:13
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - pg_data:/var/lib/postgresql/data
     restart: always
     env_file:
       - ../.env
 
   backend:
-    image: pendu1um/final_test_backend
+    image: pendu1um/final1_backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -41,7 +47,4 @@ services:
       - backend
       - frontend
 
-volumes:
-  postgres_data:
-  static_value:
-  media_value:
+

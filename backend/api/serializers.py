@@ -1,5 +1,6 @@
 from django.db.models import F
 from django.db.transaction import atomic
+from django.db.models.functions import Lower
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -12,9 +13,6 @@ from recipes.models import (
 )
 from users.models import User, Follow
 from recipes.validators import validate_ingredients, validate_cooking_time
-
-
-MIN_INGREDIENT_AMOUNT = 1
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
@@ -136,6 +134,7 @@ class ReadRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = '__all__'
+        ordering = ['-id']
 
     def get_ingredients(self, obj):
         """Получаем список ингредиентов для рецепта."""
@@ -143,7 +142,8 @@ class ReadRecipeSerializer(serializers.ModelSerializer):
         ingredients = recipe.ingredients.values(
             'id', 'name', 'measurement_unit',
             amount=F('recipeingredient__amount')
-        )
+        ).annotate(name_lower=Lower('name')).order_by('name_lower')
+
         return ingredients
 
     def get_is_favorited(self, obj):
@@ -200,16 +200,13 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
             'id', 'tags', 'author', 'ingredients',
             'name', 'image', 'text', 'cooking_time',
         )
+        lookup_field = 'ingredients'
 
-    def vvalidate_ingredients(self, data):
+    def validate(self, data):
         """Проверяем ингредиенты в рецепте."""
         ingredients = data.get('ingredients')
-        validate_ingredients(ingredients)
-        return data
-
-    def validate_cooking_time(self, data):
-        """Проверяем время приготовления."""
         cooking_time = data.get('cooking_time')
+        validate_ingredients(ingredients)
         validate_cooking_time(cooking_time)
         return data
 

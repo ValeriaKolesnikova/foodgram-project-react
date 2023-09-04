@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django_filters.rest_framework import FilterSet, filters
 
 from recipes.models import Ingredient, Recipe, Tag
@@ -6,11 +7,18 @@ from users.models import User
 
 class IngredientFilter(FilterSet):
     """Фильтр для ингридиентов."""
-    name = filters.CharFilter(lookup_expr='startswith')
+    name = filters.CharFilter(
+        field_name='name',
+        lookup_expr='istartswith',
+        method='filter_by_starting_name'
+    )
 
     class Meta:
         model = Ingredient
         fields = ('name',)
+
+    def filter_by_starting_name(self, queryset, name, value):
+        return queryset.filter(Q(name__istartswith=value))
 
 
 class RecipeFilter(FilterSet):
