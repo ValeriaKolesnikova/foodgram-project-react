@@ -5,6 +5,11 @@ MIN_AMOUNT = 1
 
 
 def validate_ingredients(ingredients):
+    ingredients_data = [ingredient.get('id') for ingredient in ingredients]
+    if len(ingredients_data) != len(set(ingredients_data)):
+        raise serializers.ValidationError(
+            'Ингредиенты рецепта должны быть уникальными'
+        )
     if not ingredients:
         raise serializers.ValidationError(
             'Рецепт не может быть без ингредиентов'
